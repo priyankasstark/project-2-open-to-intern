@@ -5,6 +5,9 @@ const { default: mongoose } = require("mongoose")
 const app = express()
 
 app.use(bodyParser.json())
+
+app.use(bodyParser.urlencoded({ extended: true }));
+
 app.use('/',route)
 
 mongoose.connect("mongodb+srv://PrachiRakhonde:TidE9uPBxvyZRFOn@cluster0.vdm2ccj.mongodb.net/group25Database?retryWrites=true&w=majority",{
