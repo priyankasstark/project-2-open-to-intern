@@ -96,7 +96,7 @@ const getList = async function(req,res){
         let findIntern = await internModel.find({collegeId : CollegeId}).select({name : 1, email : 1, mobile : 1})
         
         // No intern found in given college
-        if(findIntern.length == 0) return res.send({status:false , message:"No intern has applied for given College"})
+        if(findIntern.length == 0) return res.status(404).send({status:false , message:"No intern has applied for given College"})
         
         let obj = {
             name : name,

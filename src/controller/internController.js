@@ -66,7 +66,7 @@ const createIntern = async function(req,res){
             isDeleted : false
         }
 
-        return res.status(200).send({status : true , data : internresponse})
+        return res.status(201).send({status : true , data : internresponse})
     }
 
     catch(err){
