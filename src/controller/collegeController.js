@@ -20,6 +20,7 @@ const createCollege = async function(req, res){
 
         if (!collegeData.name.match(nameRegex)) return res.status(400).send({status:false, message: "name should be in lowercase"})  
         
+        // checking duplicate college
         let college = await collegeModel.findOne({name: collegeData.name})
 
         if(college) return res.status(400).send({status:false , message: "College already exist"})
@@ -27,7 +28,7 @@ const createCollege = async function(req, res){
         // validation for fullname 
         if(!collegeData.fullName) return res.status(400).send({status : false, message : "Please provide full name of College"})
       
-        if (!collegeData.fullName.match(fullnameRegex)) return res.status(400).send({status:false,msg: "name should be in lowercase"})  
+        if (!collegeData.fullName.match(fullnameRegex)) return res.status(400).send({status:false,msg: "College name must be contains letters only"})  
          
         //validation for logoLink
         if(!collegeData.logoLink) return res.status(400).send({status : false, message : "Please provide Logolink"})
@@ -63,24 +64,39 @@ const getList = async function(req,res){
     try{
         let data = req.query
         
-        if(Object.keys(data) == 0) return res.status(400).send({status : false, message : "Please provide College Name"})
+        // query is not given
+        if(Object.keys(data).length == 0) return res.status(400).send({status : false, message : "Query can't be empty.Please provide College Name"})
+
+        // contains query
+        if(data){
+            // if given value is empty
+            if(data.name == "") return res.status(400).send({status : false, message : "Name of College can't be empty"})
+            
+            // if different query is given
+            if(!data.name) return res.status(400).send({status : false, message : "Query must contains key = name"})          
+        }
         
+        // We made user happy here!
+        if(data.name !== ""){
+            let name = data.name.toLowerCase()
+            data.name = name
+        }
+
         // finding the valid college 
         let findCollege = await collegeModel.findOne({name : data.name, isDeleted : false})
         
+        // giving wrong college name
         if(!findCollege) return res.status(404).send({status:false , message:"No such college"})
 
         const {name, fullName, logoLink} = findCollege
     
-        if(findCollege.length == 0) return res.status(404).send({status : false, message : "No such a College"})
-        //console.log(findCollege);
-
         let CollegeId = findCollege._id
-        //console.log(CollegeId)
 
+        // finding interns in the college
         let findIntern = await internModel.find({collegeId : CollegeId}).select({name : 1, email : 1, mobile : 1})
         
-        if(findIntern.length == 0) return res.send({status:false , message:"No intern is apply"})
+        // No intern found in given college
+        if(findIntern.length == 0) return res.send({status:false , message:"No intern has applied for given College"})
         
         let obj = {
             name : name,
