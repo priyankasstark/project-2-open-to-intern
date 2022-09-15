@@ -11,7 +11,7 @@ const createIntern = async function(req,res){
         let data = req.body
         let collegeName = data.collegeName
         
-        const emailRegex = /^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$/
+        const emailRegex = /^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/
         const nameRegex = /^[a-zA-Z\s]+$/
         const mobileRegex = /^[0-9]{10}$/
 
