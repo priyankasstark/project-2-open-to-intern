@@ -69,10 +69,12 @@ const getList = async function(req,res){
     try{
         let data = req.query
         
-        // query is not given
+        //______________________________________ query is not given ____________________________________________________
+
         if(Object.keys(data).length == 0) return res.status(400).send({status : false, message : "Query can't be empty.Please provide College Name"})
 
-        // contains query
+        //________________________________________ contains query __________________________________________________________
+
         if(data){
             // if given value is empty
             if(data.collegeName == "") return res.status(400).send({status : false, message : "Name of College can't be empty"})
@@ -87,31 +89,44 @@ const getList = async function(req,res){
             data.collegeName = name
         }
 
-        // finding the valid college 
+        //____________________________________ finding valid college ___________________________________________________
+        
         let findCollege = await collegeModel.findOne({name : data.collegeName, isDeleted : false})
         
-        // giving wrong college name
+        //______________________________ giving wrong college name ________________________________________
+
         if(!findCollege) return res.status(404).send({status:false , message:"No such college"})
 
         const {name, fullName, logoLink} = findCollege
     
         let CollegeId = findCollege._id
 
-        // finding interns in the college
+        //_________________________________ finding interns in the college ________________________________________
+
         let findIntern = await internModel.find({collegeId : CollegeId}).select({name : 1, email : 1, mobile : 1})
         
-        // No intern found in given college
-        if(findIntern.length == 0) return res.status(404).send({status:false , message:"No intern has applied for given College"})
+        //______________________________No intern found in given college ___________________________________
+
+        if(findIntern.length == 0){
+            let clgObj = {
+                name : name,
+                fullName : fullName,
+                logoLink : logoLink,
+            }
+            return res.status(200).send({status : true, data : clgObj, message : "No intern has applied to this college"})
+        } 
         
+        //______________________________________  Intern found ___________________________________________________
+
         let obj = {
             name : name,
             fullName : fullName,
             logoLink : logoLink,
             interns : findIntern
         }
-
         return res.status(200).send({status: true ,data : obj})
     }
+
     catch(err){
         res.status(500).send({status : false, error : err.message})
     }
