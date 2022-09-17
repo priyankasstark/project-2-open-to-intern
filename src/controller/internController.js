@@ -13,19 +13,26 @@ const createIntern = async function(req,res){
         
         const emailRegex = /^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/
         const nameRegex = /^[a-zA-Z\s]+$/
-        const mobileRegex = /^[0-9]{10}$/
-
+        const mobileRegex = /^[6789]\d{9}$/  // As indian mobile number starts from digit 6 to 9
+        
+        // If body is empty
         if(Object.keys(data).length === 0) return res.status(400).send({status : false, message : "Provide data. Body can't be empty!"})
         
-        // validation for intern name
+        //_____________________________________ validation for intern name_____________________________________
+
         if(!data.name) return res.status(400).send({status : false, message : "Name is Mandatory"})
 
         if(!data.name.match(nameRegex)) return res.status(400).send({status : false, message : "Invalid format of Name"})
-       
-        // validation for college name 
+        
+        let finduser = await internModel.findOne({name : data.name})
+        if(finduser)  return res.status(400).send({status : false, message : "Intern Already Exist!"})
+        
+        //_______________________________________validation for college name______________________________________
+
         if(!collegeName) return res.status(400).send({status : false, message : "College Name is mandatory"})
         
-        //validation for mobile
+        //_________________________________________validation for mobile__________________________________________
+
         if (!data.mobile) return res.status(400).send({ status: false, message : "mobile number is required" })
 
         if(!data.mobile.match(mobileRegex)) return res.status(400).send({status : false, message : "Invalid format of mobile number"})
@@ -34,12 +41,14 @@ const createIntern = async function(req,res){
 
         if (validmobile)  return res.status(400).send({status: false , message:"Mobile number is already exist"})
         
-        // validation for email
+        //_________________________________________ validation for email_____________________________________________
+
         if (!data.email) return res.status(400).send({ Status: false, message: "email is required" })
 
         if(!data.email.match(emailRegex)) return res.status(400).send({status : false, message : "Invalid Format of Email"})
 
-        // checking duplicate email
+        //______________________________________checking duplicate email_______________________________________________
+
         let validEmail = await internModel.findOne({email : data.email})
 
         if(validEmail) return res.status(400).send({status : false, message : "Email is already exist"})

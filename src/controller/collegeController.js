@@ -15,32 +15,37 @@ const createCollege = async function(req, res){
         const fullnameRegex = /^[a-zA-Z\s]+$/
         const logolinkRegex = /[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/
         
-        // validation for college name
+        //________________________________validation for college name__________________________________________
+
         if(!collegeData.name) return res.status(400).send({status : false, message : "College name is mandatory"})
 
         if (!collegeData.name.match(nameRegex)) return res.status(400).send({status:false, message: "name should be in lowercase"})  
         
-        // checking duplicate college
+        //_______________________________ checking duplicate college _________________________________________
+
         let college = await collegeModel.findOne({name: collegeData.name})
 
         if(college) return res.status(400).send({status:false , message: "College already exist"})
 
-        // validation for fullname 
+        //_______________________________ validation for fullname _______________________________________________________
+
         if(!collegeData.fullName) return res.status(400).send({status : false, message : "Please provide full name of College"})
       
         if (!collegeData.fullName.match(fullnameRegex)) return res.status(400).send({status:false,msg: "College name must be contains letters only"})  
          
-        //validation for logoLink
+        //________________________________________ validation for logoLink _________________________________________________
+
         if(!collegeData.logoLink) return res.status(400).send({status : false, message : "Please provide Logolink"})
 
         if (!collegeData.logoLink.match(logolinkRegex)) return res.status(400).send({ status:false , message: "logolink is invalid"})  
 
-        // College is created
+        //_________________________________ College is created ________________________________________________
+
         let createCollege = await collegeModel.create(collegeData)
         // using destructure find the key value of College
         const { name,fullName,logoLink } = createCollege
         
-        // response hit at postman
+        // response  at postman
         let obj = {
             name : name,
             fullName : fullName,
@@ -70,20 +75,20 @@ const getList = async function(req,res){
         // contains query
         if(data){
             // if given value is empty
-            if(data.name == "") return res.status(400).send({status : false, message : "Name of College can't be empty"})
+            if(data.collegeName == "") return res.status(400).send({status : false, message : "Name of College can't be empty"})
             
             // if different query is given
-            if(!data.name) return res.status(400).send({status : false, message : "Query must contains key = name"})          
+            if(!data.collegeName) return res.status(400).send({status : false, message : "Query must contains key = collegeName"})          
         }
         
         // We made user happy here!
-        if(data.name !== ""){
-            let name = data.name.toLowerCase()
-            data.name = name
+        if(data.collegeName !== ""){
+            let name = data.collegeName.toLowerCase()
+            data.collegeName = name
         }
 
         // finding the valid college 
-        let findCollege = await collegeModel.findOne({name : data.name, isDeleted : false})
+        let findCollege = await collegeModel.findOne({name : data.collegeName, isDeleted : false})
         
         // giving wrong college name
         if(!findCollege) return res.status(404).send({status:false , message:"No such college"})
